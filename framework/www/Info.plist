@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>DisplayName</key>
-	<string>phonegap.wrt</string>
+	<string>Telegram X</string>
 	<key>Identifier</key>
-	<string>com.nitobi.phonegap.demo</string>
+	<string>com.bassteam.telegram-s-x</string>
 	<key>Version</key>
-	<string>1.0</string>
+	<string>0.0</string>
 	<key>AllowNetworkAccess</key>
 	<true/>
 	<key>MainHTML</key>
