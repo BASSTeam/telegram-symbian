@@ -1,0 +1,7 @@
+{
+    "name": "telegram-x",
+    "version": "0.0.0",
+    "scripts": {
+        "build": "make"
+    }
+}
