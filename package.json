@@ -1,7 +1,15 @@
 {
     "name": "telegram-x",
     "version": "0.0.0",
+    "devDependencies": {
+        "uglify-js": "^2.6.4"
+    },
     "scripts": {
-        "build": "make all"
-    }
+        "build": "node build && make all"
+    },
+    "toMinify": [
+        "framework/www/app",
+        "framework/www/ES3-Promise",
+        "framework/www/phonegap"
+    ]
 }
