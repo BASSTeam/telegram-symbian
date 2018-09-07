@@ -4,4 +4,5 @@ fs.readdir('src/js', (err, files) =>
     files.forEach(file => 
         spawn("node_modules/.bin/uglifyjs", [`src/js/${file}`,  "--support-ie8", "--compress", "--output", `framework/www/js/${file}`])
     )
-)
+);
+spawn("node_modules/.bin/uglifyjs", ['lib/phonegap.js',  "--support-ie8", "--compress", "--output", 'framework/www/js/phonegap.js'])
