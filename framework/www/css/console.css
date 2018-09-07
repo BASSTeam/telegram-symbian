@@ -4,11 +4,11 @@
     overflow: hidden;
 }
 #console > .log{
-    color: white;
+    color: #ffffff;
 }
 #console > .warn{
-    color: yellow;
+    color: #ffff00;
 }
 #console > .error{
-    color: red;
+    color: #ff0000;
 }

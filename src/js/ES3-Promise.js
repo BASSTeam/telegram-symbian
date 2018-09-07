@@ -30,7 +30,7 @@ window.Promise = (function(){
         }
     }
     document.addEventListener('@PromiseReactionJob', function(ev){
-        if(ev.detail.getState() == 'WAITING') ev.detail.setState();
+        if(ev.detail.getState() == 0) ev.detail.setState();
         ev.detail.callback(ev.detail.val);
     });
     /**
@@ -38,12 +38,12 @@ window.Promise = (function(){
      * @param {Function} asyncFunction
      */
     return function Promise(asyncFunction){
-        var state = 'WAITING', value, callbackStack = [], errorCallbackStack = [];
+        var state = 0, value, callbackStack = [], errorCallbackStack = [];
         function setDone(){
-            state = 'RESOLVED'
+            state = 1
         }
         function setErr(){
-            state = 'REJECTED'
+            state = 2
         }
         function getState(){
             return state
@@ -68,11 +68,11 @@ window.Promise = (function(){
         }
         var res = {
             then: function(callback){
-                if(state == 'WAITING') addCallback(callback); else if(state == 'RESOLVED') callback(value);
+                if(state == 0) addCallback(callback); else if(state == 1) callback(value);
                 return res
             },
             catch: function(callback){
-                if(state == 'WAITING') addErrorCallback(callback); else if(state == 'REJECTED') callback(value);
+                if(state == 0) addErrorCallback(callback); else if(state == 2) callback(value);
                 return res
             }
         };

@@ -1,0 +1,19 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+#menu{
+    height: 540px;
+    background-color: #f57364;
+    width: 0;
+    position: absolute;
+}
+#top{
+    height: 48px;
+    background-color: #017e01;
+}
+#content{
+    height: 492px;
+    background-color: #4cb0d8;
+}
