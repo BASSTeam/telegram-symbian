@@ -1,0 +1,14 @@
+#console{
+    height: 100px;
+    background-color: black;
+    overflow: hidden;
+}
+#console > .log{
+    color: white;
+}
+#console > .warn{
+    color: yellow;
+}
+#console > .error{
+    color: red;
+}
