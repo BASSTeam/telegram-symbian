@@ -1,8 +1,23 @@
-const {spawnSync: spawn} = require('child_process'), fs = require('fs');
-spawn('mkdir', ['-p', 'framework/www/js']);
-fs.readdir('src/js', (err, files) => 
+const {
+    compress,
+    list,
+    mkdir,
+} = ((cp, fs) => {
+    return {
+        compress: {
+            js: (target, destination) => {
+                cp.spawnSync('node_modules/.bin/uglifyjs', [target, '--support-ie8', '--compress', '--output', destination])
+            },
+        },
+        list: fs.readdirSync,
+        mkdir: destination => spawn('mkdir', ['-p', destination]),
+    }
+})(require('child_process'), require('fs'));
+
+mkdir('framework/www/js');
+// Compress JS
+list('src/js', (err, files) => 
     files.forEach(file => 
-        spawn("node_modules/.bin/uglifyjs", [`src/js/${file}`,  "--support-ie8", "--compress", "--output", `framework/www/js/${file}`])
+        compress.js(`src/js/${file}`, `framework/www/js/${file}`)
     )
 );
-spawn("node_modules/.bin/uglifyjs", ['lib/phonegap.js',  "--support-ie8", "--compress", "--output", 'framework/www/js/phonegap.js'])
