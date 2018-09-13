@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ES3",
+        "removeComments": false,
+        "outDir": "./temp/output",
+        "rootDir": "./temp/input",
+        "sourceMap": false,
+        "module": "none",
+        "allowJs": true
+    },
+    "include": ["./temp/input"],
+    "exclude": []
+}
