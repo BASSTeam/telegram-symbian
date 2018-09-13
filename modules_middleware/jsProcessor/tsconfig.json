@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES3",
-        "removeComments": false,
+        "removeComments": true,
         "outDir": "./temp/output",
         "rootDir": "./temp/input",
         "sourceMap": false,

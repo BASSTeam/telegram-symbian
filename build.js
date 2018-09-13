@@ -1,41 +1,51 @@
-const {
-    compress,
-    list,
-    mkdir,
-    precompile,
-    rm,
-} = ((cp, fs, tsconfig, path) => {
-    function precompileJS(){
-        console.log(`precompileJS called. Compiler: ${precompileJS.compiler}, targetDir: ${precompileJS.targetDir}`);
-        console.log(cp.spawnSync(precompileJS.compiler, [], {cwd: precompileJS.targetDir}).stdout.toString())
+const js = require('modules_middleware/jsProcessor');
+const { readFileSync: read, writeFileSync: write, readdirSync: list, mkdirSync } = require('fs');
+function mkdir(path){
+    try{
+        mkdirSync(path)
+    } catch(e){
+        if(!e.stack.startsWith('Error: EEXIST:')) throw e
     }
-    precompileJS.targetDir = path.resolve(__dirname, 'build');
-    precompileJS.tempDir = path.resolve(precompileJS.targetDir, tsconfig.compilerOptions.outDir);
-    precompileJS.compiler = path.resolve(__dirname, 'node_modules/.bin/tsc');
-    return {
-        compress: {
-            js: (target, destination) => {
-                cp.spawnSync('node_modules/.bin/uglifyjs', [target, '--support-ie8', '--compress', '--output', destination])
-            },
-        },
-        list: fs.readdirSync,
-        mkdir: destination => cp.spawnSync('mkdir', ['-p', destination]),
-        precompile: {
-            js: precompileJS
-        },
-        rm: destination => cp.spawnSync('rm', ['-rf', destination]),
-    }
-})(require('child_process'), require('fs'), require('./build/tsconfig.json'), require('path'));
+}
 
-mkdir('framework/www/js');
-mkdir('framework/www/css');
-mkdir('framework/www/js/libs');
+mkdir(__dirname + '/framework/www/js');
+mkdir(__dirname + '/framework/www/js/lib');
+//mkdir(__dirname + '/framework/www/css');
+
 // Compile and compress JS
-precompile.js();
-list(precompile.js.tempDir).forEach(file => {
+//precompile.js();
+console.log('--- Building JS ---');
+list(__dirname + '/src/js').forEach(file => {
     if(!/\.js$/.test(file)) return;
-    console.log(file);
-    compress.js(`${precompile.js.tempDir}/${file}`, `framework/www/js/${file}`);
+    process.stdout.write(`${file}... `);
+    write(
+        `framework/www/js/${file}`,
+        js.compile(
+            js.minify(
+                read(
+                    `${__dirname}/src/js/${file}`,
+                    'utf8'
+                )
+            )
+        ),
+        'utf8'
+    );
+    console.log('OK');
 });
-rm(precompile.js.tempDir);
+console.log('--- Building JS libs ---');
+list(__dirname + '/src/js/lib').forEach(lib => {
+    process.stdout.write(`${lib}... `);
+    var Builder = require(`${__dirname}/src/js/lib/${lib}/build.js`);
+    write(
+        `${__dirname}/framework/www/js/lib/${lib}.js`,
+        js.compile(
+            js.minify(
+                Builder()
+            )
+        ),
+        'utf8'
+    );
+    console.log('OK');
+});
+//rm(precompile.js.tempDir);
 // End of JS compilation/compression block
