@@ -5,11 +5,18 @@
         "uglify-js": "^2.6.4"
     },
     "scripts": {
-        "build": "node build && make all"
+        "build": "node build && make all",
+        "test:promise": "cd tests/promise && node test",
+        "test": "yarn test:promise"
     },
     "toMinify": [
         "framework/www/app",
         "framework/www/ES3-Promise",
         "framework/www/phonegap"
-    ]
+    ],
+    "dependencies": {
+        "promises-aplus-tests": "^2.1.2",
+        "require-from-string": "^2.0.2",
+        "typescript": "^3.0.3"
+    }
 }

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ES3",
+        "removeComments": false,
+        "outDir": "../build/_temp/",
+        "rootDir": "../src/js",
+        "sourceMap": false,
+        "module": "none",
+        "allowJs": true
+    },
+    "include": ["../src/js"],
+    "exclude": []
+}

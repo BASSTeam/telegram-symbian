@@ -2,7 +2,16 @@ const {
     compress,
     list,
     mkdir,
-} = ((cp, fs) => {
+    precompile,
+    rm,
+} = ((cp, fs, tsconfig, path) => {
+    function precompileJS(){
+        console.log(`precompileJS called. Compiler: ${precompileJS.compiler}, targetDir: ${precompileJS.targetDir}`);
+        console.log(cp.spawnSync(precompileJS.compiler, [], {cwd: precompileJS.targetDir}).stdout.toString())
+    }
+    precompileJS.targetDir = path.resolve(__dirname, 'build');
+    precompileJS.tempDir = path.resolve(precompileJS.targetDir, tsconfig.compilerOptions.outDir);
+    precompileJS.compiler = path.resolve(__dirname, 'node_modules/.bin/tsc');
     return {
         compress: {
             js: (target, destination) => {
@@ -10,14 +19,23 @@ const {
             },
         },
         list: fs.readdirSync,
-        mkdir: destination => spawn('mkdir', ['-p', destination]),
+        mkdir: destination => cp.spawnSync('mkdir', ['-p', destination]),
+        precompile: {
+            js: precompileJS
+        },
+        rm: destination => cp.spawnSync('rm', ['-rf', destination]),
     }
-})(require('child_process'), require('fs'));
+})(require('child_process'), require('fs'), require('./build/tsconfig.json'), require('path'));
 
 mkdir('framework/www/js');
-// Compress JS
-list('src/js', (err, files) => 
-    files.forEach(file => 
-        compress.js(`src/js/${file}`, `framework/www/js/${file}`)
-    )
-);
+mkdir('framework/www/css');
+mkdir('framework/www/js/libs');
+// Compile and compress JS
+precompile.js();
+list(precompile.js.tempDir).forEach(file => {
+    if(!/\.js$/.test(file)) return;
+    console.log(file);
+    compress.js(`${precompile.js.tempDir}/${file}`, `framework/www/js/${file}`);
+});
+rm(precompile.js.tempDir);
+// End of JS compilation/compression block
