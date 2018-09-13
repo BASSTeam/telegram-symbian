@@ -1,3 +1,5 @@
 app.wgz
 node_modules
 framework/www/js
+build/_temp
+modules_middleware/es6toes3/temp
