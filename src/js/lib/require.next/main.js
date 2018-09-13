@@ -35,7 +35,7 @@ window.require = (() => {
                 baseDir = (this || {}).constructor === String ? `${this}` : __dirname;
             dir.pop(); // removes last element (filename)
             httpGet(absolutePath.test(url) ? url : `${baseDir}/${url}`).then(script => {
-                (new Function('return new window.require.internalPromiseAPlus(function(__filename, __dirname) => {' + /*
+                (new Function('return new window.require.internalPromiseLike(function(__filename, __dirname){' + /*
                     Using   resolve as __filename,
                             reject  as __dirname
                     to prevent implicit transfer
@@ -57,6 +57,6 @@ window.require = (() => {
             })
         })
     }
-    require.internalPromiseAPlus = Promise;
+    require.internalPromiseLike = Promise;
     return require;
 })();

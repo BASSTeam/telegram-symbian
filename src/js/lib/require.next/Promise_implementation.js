@@ -1,33 +1,41 @@
-var _a = (function () {
+const {
+    setState,
+    getState,
+    registerPromise,
+    setVal,
+    getVal,
+    getCallbackStack,
+    getErrorCallbackStack,
+} = (() => {
     var _ = { names: [], states: {}, values: {}, callbackStacks: {}, errorCallbackStack: {} };
     return {
-        setState: function (promise, state) {
+        setState(promise, state){
             _.states[promise.__RegisteredPromiseIndex] = state;
             return state;
         },
-        getState: function (promise) {
+        getState(promise){
             return _.states[promise.__RegisteredPromiseIndex] || 0;
         },
-        registerPromise: function (promise) {
+        registerPromise(promise){
             promise.__RegisteredPromiseIndex = _.names.push(promise) - 1;
             _.callbackStacks[promise.__RegisteredPromiseIndex] = [];
             _.errorCallbackStack[promise.__RegisteredPromiseIndex] = [];
         },
-        setVal: function (promise, val) {
+        setVal(promise, val){
             _.values[promise.__RegisteredPromiseIndex] = val;
             return val;
         },
-        getVal: function (promise) {
+        getVal(promise){
             return _.values[promise.__RegisteredPromiseIndex];
         },
-        getCallbackStack: function (promise) {
+        getCallbackStack(promise){
             return _.callbackStacks[promise.__RegisteredPromiseIndex];
         },
-        getErrorCallbackStack: function (promise) {
+        getErrorCallbackStack(promise){
             return _.errorCallbackStack[promise.__RegisteredPromiseIndex];
         }
     };
-})(), setState = _a.setState, getState = _a.getState, registerPromise = _a.registerPromise, getVal = _a.getVal, setVal = _a.setVal, getCallbackStack = _a.getCallbackStack, getErrorCallbackStack = _a.getErrorCallbackStack;
+})();
 /**
  * @typedef CustomEventParams
  * @property {Boolean} bubbles
@@ -59,93 +67,114 @@ function PromiseReactionJob(stack, getState, setState, value) {
         document.dispatchEvent(event);
     }
 }
-document.addEventListener('@PromiseReactionJob', function (ev) {
+document.addEventListener('@PromiseReactionJob', ev => {
     if (ev.detail.getState() == 0)
         ev.detail.setState();
     ev.detail.callback(ev.detail.val);
 });
-/**
- * @constructor
- * @param {Function} asyncFunction
- */
-function Promise(asyncFunction) {
-    var _this = this;
-    _classCallCheck(this, Promise);
-    registerPromise(this);
-    var _getState = function () { return getState(_this); };
-    var reject = function (err) {
-        setVal(_this, err);
-        PromiseReactionJob(getErrorCallbackStack(_this), _getState, function () { return setState(_this, 2); }, err);
-    };
-    try {
-        asyncFunction(function (val) {
-            setVal(_this, val);
-            PromiseReactionJob(getCallbackStack(_this), _getState, function () { return setState(_this, 1); }, val);
-        }, reject);
-    }
-    catch (e) {
-        reject(e);
-    }
-}
-Promise.prototype.then = function (callback, errorCallback) {
-    var state = getState(this), value = getVal(this);
-    if(typeof callback == 'function'){
-        if (state == 0)
-            getCallbackStack(this).push(callback);
-        else if (state == 1)
-            callback(value);
-    }
-    if(typeof errorCallback == 'function'){
-        if (state == 0)
-            getErrorCallbackStack(this).push(errorCallback);
-        else if (state == 2)
-            callback(value);
-    }
-    return this;
-};
-Promise.prototype["catch"] = function (errorCallback) {
-    if(typeof errorCallback == 'function'){
-        var state = getState(this);
-        if (state == 0)
-            getErrorCallbackStack(this).push(errorCallback);
-        else if (state == 2)
-            errorCallback(getVal(this));
-    }
-    return this;
-};
-Promise.all = function (iterable) {
-    return new Promise(function (resolve, reject) {
-        var doneCount = 0, results = [];
-        for (var i = 0; i < iterable.length; i++) {
-            iterable[i].then(function (result) {
-                results[i] = result;
-                if (++doneCount == iterable.length)
-                    resolve(results);
-            })["catch"](reject);
-        }
-    });
-};
-Promise.race = function (iterable) {
-    return new Promise(function (resolve, reject) {
-        for (var i = 0; i < iterable.length; i++) {
-            iterable[i].then(resolve)["catch"](reject);
-        }
-    });
-};
-Promise.reject = function (reason) { return new Promise(function (_, reject) { return reject(reason); }); };
+
 function resolver(value, resolve, reject) {
     if (typeof value != 'object' || typeof value != 'function' || !value.then || !value.then.apply)
         resolve(value);
     else {
         value.then(function (next) { return resolver(next, resolve, reject); });
         try {
-            value["catch"](reject);
+            value.catch(reject);
         }
         catch (e) { }
     }
 }
-Promise.resolve = function (value) {
-    return new Promise(function (resolve, reject) {
-        resolver(value, resolve, reject);
-    });
-};
+
+class Promise{
+    /**
+     * @callback Resolver
+     * @param {any} data
+     * @return {void}
+     */
+    /**
+     * @callback Rejecter
+     * @param {Error} reason
+     * @return {void}
+     */
+    /**
+     * @callback PromiseCallback
+     * @param {Resolver} resolve
+     * @param {Rejecter} reject
+     * @return {void}
+     */
+    /**
+     * @param {PromiseCallback} asyncFunction
+     */
+    constructor(asyncFunction){
+        registerPromise(this);
+        var _getState = () => {
+            return getState(this)
+        };
+        var reject = err => {
+            setVal(this, err);
+            PromiseReactionJob(getErrorCallbackStack(this), _getState, () => setState(this, 2), err)
+        };
+        try {
+            asyncFunction(val => {
+                setVal(this, val);
+                PromiseReactionJob(getCallbackStack(this), _getState, () => setState(this, 1), val)
+            }, reject);
+        }
+        catch (e){
+            reject(e)
+        }
+    }
+    then(callback, errorCallback){
+        var state = getState(this), value = getVal(this);
+        if(typeof callback == 'function'){
+            if (state == 0)
+                getCallbackStack(this).push(callback);
+            else if (state == 1)
+                callback(value);
+        }
+        if(typeof errorCallback == 'function'){
+            if (state == 0)
+                getErrorCallbackStack(this).push(errorCallback);
+            else if (state == 2)
+                callback(value);
+        }
+        return this
+    }
+    catch(errorCallback){
+        if(typeof errorCallback == 'function'){
+            var state = getState(this);
+            if (state == 0)
+                getErrorCallbackStack(this).push(errorCallback);
+            else if (state == 2)
+                errorCallback(getVal(this));
+        }
+        return this
+    }
+    static all(iterable){
+        return new Promise((resolve, reject) => {
+            var doneCount = 0, results = [];
+            for (var i = 0; i < iterable.length; i++) {
+                iterable[i].then(result => {
+                    results[i] = result;
+                    if (++doneCount == iterable.length)
+                        resolve(results);
+                }).catch(reject);
+            }
+        })
+    }
+    static race(iterable){
+        return new Promise((resolve, reject) => {
+            for (var i = 0; i < iterable.length; i++){
+                iterable[i].then(resolve).catch(reject);
+            }
+        })
+    }
+    static reject(reason){
+        return new Promise((_, reject) => reject(reason))
+    }
+    static resolve(value){
+        return new Promise((resolve, reject) => {
+            resolver(value, resolve, reject)
+        })
+    }
+}
