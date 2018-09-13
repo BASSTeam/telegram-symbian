@@ -73,15 +73,15 @@ document.addEventListener('@PromiseReactionJob', ev => {
     ev.detail.callback(ev.detail.val);
 });
 
-function resolver(value, resolve, reject) {
-    if (typeof value != 'object' || typeof value != 'function' || !value.then || !value.then.apply)
-        resolve(value);
+function resolver(value, resolve, reject){
+    if (typeof value != 'object' || typeof value != 'function' || typeof value.then != 'function') resolve(value);
     else {
-        value.then(function (next) { return resolver(next, resolve, reject); });
+        value.then(next => {
+            resolver(next, resolve, reject)
+        });
         try {
-            value.catch(reject);
-        }
-        catch (e) { }
+            value.catch(reject)
+        } catch(e){}
     }
 }
 
@@ -118,9 +118,8 @@ class Promise{
             asyncFunction(val => {
                 setVal(this, val);
                 PromiseReactionJob(getCallbackStack(this), _getState, () => setState(this, 1), val)
-            }, reject);
-        }
-        catch (e){
+            }, reject)
+        } catch(e){
             reject(e)
         }
     }
@@ -156,8 +155,7 @@ class Promise{
             for (var i = 0; i < iterable.length; i++) {
                 iterable[i].then(result => {
                     results[i] = result;
-                    if (++doneCount == iterable.length)
-                        resolve(results);
+                    if (++doneCount == iterable.length) resolve(results)
                 }).catch(reject);
             }
         })
