@@ -1,13 +1,12 @@
 {
     "name": "telegram-x",
     "version": "0.0.0",
-    "devDependencies": {
-        "uglify-js": "^2.6.4"
-    },
+    "devDependencies": {},
     "scripts": {
         "build": "node build && make all",
         "test:promise": "cd tests/promise && node test",
-        "test": "yarn test:promise"
+        "test": "yarn test:promise",
+        "postinstall": "node -e 'const {spawnSync:spawn} = require(\"child_process\"); (require(\"./package.json\").noEdit || []).forEach(ne => spawn(\"git\", [\"checkout\", ne]))'"
     },
     "toMinify": [
         "framework/www/app",
@@ -17,6 +16,11 @@
     "dependencies": {
         "promises-aplus-tests": "^2.1.2",
         "require-from-string": "^2.0.2",
-        "typescript": "^3.0.3"
-    }
+        "typescript": "^3.0.3",
+        "uglify-es": "^3.3.9"
+    },
+    "noEdit": [
+        "node_modules/modules_middleware",
+        "node_modules/src"
+    ]
 }
