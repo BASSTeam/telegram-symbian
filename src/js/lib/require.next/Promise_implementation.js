@@ -36,23 +36,23 @@ const {
         }
     };
 })();
-/**
- * @typedef CustomEventParams
- * @property {Boolean} bubbles
- * @property {Boolean} cancelable
- * @property {any} detail
- */
-/**
- * @constructor
- * @param {String} event
- * @param {CustomEventParams} params
- */
-function CustomEvent(event, params) {
-    _classCallCheck(this, CustomEvent);
-    params = params || { bubbles: false, cancelable: false, detail: undefined };
-    var evt = document.createEvent('CustomEvent');
-    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-    return evt;
+class CustomEvent{
+    /**
+     * @typedef CustomEventParams
+     * @property {Boolean} bubbles
+     * @property {Boolean} cancelable
+     * @property {any} detail
+     */
+    /**
+     * @param {String} event
+     * @param {CustomEventParams} params
+     */
+    constructor(event, params){
+        params = params || { bubbles: false, cancelable: false, detail: undefined };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+        return evt;
+    }
 }
 function PromiseReactionJob(stack, getState, setState, value) {
     for (var i = 0; i < stack.length; i++) {
