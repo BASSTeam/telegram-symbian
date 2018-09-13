@@ -8,7 +8,7 @@ const {
 
 module.exports = input => {
     write(__dirname + '/temp/input/script.js', input, 'utf8');
-    spawn('tsc', {
+    spawn(__dirname + '/node_modules/.bin/tsc', {
         cwd: __dirname
     });
     var _ = read(__dirname + '/temp/output/script.js', 'utf8');
