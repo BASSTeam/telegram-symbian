@@ -1,9 +1,4 @@
 window.require = (() => {
-    function _classCallCheck(instance, Constructor){
-        if(!(instance instanceof Constructor)){
-            throw new TypeError("Cannot call a class as a function")
-        }
-    }
     const absolutePath = /^(\w+):\/\//,
         __filename = (_ => {
             return `${_[_.length-3]}://${_[_.length-2]}`
