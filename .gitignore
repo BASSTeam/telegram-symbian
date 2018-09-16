@@ -1,5 +1,5 @@
 app.wgz
 node_modules
-framework/www/js
+_built
 build/_temp
 modules_middleware/jsProcessor/temp

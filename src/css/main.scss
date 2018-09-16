@@ -1,9 +1,10 @@
-html, body{
+html, body {
     margin: 0;
     padding: 0;
     border: 0;
 }
-#menu{
+
+#menu {
     height: 540px;
     background-color: #f57364;
     width: 200px;
@@ -11,14 +12,16 @@ html, body{
     left: -100px;
     z-index: 1;
 }
-#top{
+
+#top {
     height: 48px;
     background-color: #017e01;
     position: static;
     left: 0;
     z-index: 0;
 }
-#content{
+
+#content {
     height: 492px;
     background-color: #4cb0d8;
     position: static;

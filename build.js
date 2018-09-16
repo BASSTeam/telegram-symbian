@@ -1,5 +1,8 @@
 const js = require('modules_middleware/jsProcessor');
 const { readFileSync: read, writeFileSync: write, readdirSync: list, mkdirSync } = require('fs');
+const del = require('rmrf')
+const buildDir = __dirname + '/_built',
+    www = buildDir + '/www';
 function mkdir(path){
     try{
         mkdirSync(path)
@@ -7,10 +10,11 @@ function mkdir(path){
         if(!e.stack.startsWith('Error: EEXIST:')) throw e
     }
 }
-
-mkdir(__dirname + '/framework/www/js');
-mkdir(__dirname + '/framework/www/js/lib');
-//mkdir(__dirname + '/framework/www/css');
+mkdir(buildDir);
+mkdir(www);
+mkdir(www + '/js');
+mkdir(www + '/js/lib');
+mkdir(www + '/css');
 
 // Compile and compress JS
 //precompile.js();
@@ -19,7 +23,7 @@ list(__dirname + '/src/js').forEach(file => {
     if(!/\.js$/.test(file)) return;
     process.stdout.write(`${file}... `);
     write(
-        `framework/www/js/${file}`,
+        `${www}/js/${file}`,
         js.compile(
             js.minify(
                 read(
@@ -37,7 +41,7 @@ list(__dirname + '/src/js/lib').forEach(lib => {
     process.stdout.write(`${lib}... `);
     var Builder = require(`${__dirname}/src/js/lib/${lib}/build.js`);
     write(
-        `${__dirname}/framework/www/js/lib/${lib}.js`,
+        `${www}/js/lib/${lib}.js`,
         js.compile(
             js.minify(
                 Builder()
@@ -49,8 +53,9 @@ list(__dirname + '/src/js/lib').forEach(lib => {
 });
 console.log('--- Compressing ---');
 (async zip => {
-    write(__dirname + '/app.wgz', await zip(__dirname + '/framework'));
+    write(__dirname + '/app.wgz', await zip(buildDir));
     console.log('--- Done ---');
+    del(__dirname + '/_built')
 })(require('modules_middleware/zipper'))
 //rm(precompile.js.tempDir);
 // End of JS compilation/compression block

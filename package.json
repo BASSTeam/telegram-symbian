@@ -14,17 +14,21 @@
         "framework/www/phonegap"
     ],
     "dependencies": {
+        "clean-css": "^4.2.1",
         "jszip": "^3.1.5",
         "promises-aplus-tests": "^2.1.2",
         "require-from-string": "^2.0.2",
+        "rmrf": "^2.0.0",
+        "sass": "^1.13.4",
         "typescript": "^3.0.3",
-        "uglify-es": "^3.3.9"
+        "uglify-es": "^3.3.9",
+        "uglifycss": "^0.0.29"
     },
     "noEdit": [
         "node_modules/modules_middleware",
         "node_modules/src"
     ],
     "engines": {
-        "node" : ">=6.0.0"
+        "node": ">=6.0.0"
     }
 }

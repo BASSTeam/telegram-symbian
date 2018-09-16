@@ -1,0 +1,16 @@
+#console {
+    height: 100px;
+    background-color: black;
+    overflow: hidden;
+    > {
+        .log {
+            color: #ffffff;
+        }
+        .warn {
+            color: #ffff00;
+        }
+        .error {
+            color: #ff0000;
+        }
+    }
+}
