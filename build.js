@@ -1,6 +1,7 @@
 const js = require('modules_middleware/jsProcessor');
-const { readFileSync: read, writeFileSync: write, readdirSync: list, mkdirSync } = require('fs');
-const del = require('rmrf')
+const { readFileSync: read, writeFileSync: write, readdirSync: list, mkdirSync, statSync: stat } = require('fs');
+const del = require('rmrf');
+const sass = require('sass');
 const buildDir = __dirname + '/_built',
     www = buildDir + '/www';
 function mkdir(path){
@@ -12,13 +13,11 @@ function mkdir(path){
 }
 mkdir(buildDir);
 mkdir(www);
-mkdir(www + '/js');
-mkdir(www + '/js/lib');
-mkdir(www + '/css');
 
 // Compile and compress JS
 //precompile.js();
 console.log('--- Building JS ---');
+mkdir(www + '/js');
 list(__dirname + '/src/js').forEach(file => {
     if(!/\.js$/.test(file)) return;
     process.stdout.write(`${file}... `);
@@ -37,6 +36,7 @@ list(__dirname + '/src/js').forEach(file => {
     console.log('OK');
 });
 console.log('--- Building JS libs ---');
+mkdir(www + '/js/lib');
 list(__dirname + '/src/js/lib').forEach(lib => {
     process.stdout.write(`${lib}... `);
     var Builder = require(`${__dirname}/src/js/lib/${lib}/build.js`);
@@ -49,6 +49,16 @@ list(__dirname + '/src/js/lib').forEach(lib => {
         ),
         'utf8'
     );
+    console.log('OK');
+});
+console.log('--- Building CSS ---');
+mkdir(www + '/css');
+list(`${__dirname}/src/css`).forEach(scss => {
+    if(!/\.scss/.test(scss)) return;
+    var target = scss.slice(0, -4) + 'css';
+    process.stdout.write(`${target}... `);
+    var res = sass.renderSync({file: `${__dirname}/src/css/${scss}`});
+    write(`${www}/css/${target}`, res.css);
     console.log('OK');
 });
 console.log('--- Compressing ---');
