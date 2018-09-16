@@ -47,5 +47,10 @@ list(__dirname + '/src/js/lib').forEach(lib => {
     );
     console.log('OK');
 });
+console.log('--- Compressing ---');
+(async zip => {
+    write(__dirname + '/app.wgz', await zip(__dirname + '/framework'));
+    console.log('--- Done ---');
+})(require('modules_middleware/zipper'))
 //rm(precompile.js.tempDir);
 // End of JS compilation/compression block
