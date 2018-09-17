@@ -2,6 +2,7 @@ const js = require('modules_middleware/jsProcessor');
 const { readFileSync: read, writeFileSync: write, readdirSync: list, mkdirSync, statSync: stat } = require('fs');
 const del = require('rmrf');
 const sass = require('sass');
+const CleanCSS = require('clean-css');
 const buildDir = __dirname + '/_built',
     www = buildDir + '/www';
 function mkdir(path){
@@ -14,8 +15,6 @@ function mkdir(path){
 mkdir(buildDir);
 mkdir(www);
 
-// Compile and compress JS
-//precompile.js();
 console.log('--- Building JS ---');
 mkdir(www + '/js');
 list(__dirname + '/src/js').forEach(file => {
@@ -57,8 +56,18 @@ list(`${__dirname}/src/css`).forEach(scss => {
     if(!/\.scss/.test(scss)) return;
     var target = scss.slice(0, -4) + 'css';
     process.stdout.write(`${target}... `);
-    var res = sass.renderSync({file: `${__dirname}/src/css/${scss}`});
-    write(`${www}/css/${target}`, res.css);
+    write(
+        `${www}/css/${target}`,
+        (
+            new CleanCSS({
+                compatibility: 'ie7'
+            }).minify(
+                sass.renderSync({
+                    file: `${__dirname}/src/css/${scss}`
+                }).css.toString()
+            )
+        ).styles
+    );
     console.log('OK');
 });
 console.log('--- Compressing ---');
@@ -67,5 +76,3 @@ console.log('--- Compressing ---');
     console.log('--- Done ---');
     del(__dirname + '/_built')
 })(require('modules_middleware/zipper'))
-//rm(precompile.js.tempDir);
-// End of JS compilation/compression block
